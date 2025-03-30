@@ -1,21 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   args_validator.h                                   :+:      :+:    :+:   */
+/*   execute_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/03/30 14:46:57 by schiper           #+#    #+#             */
-/*   Updated: 2025/03/30 15:54:02 by schiper          ###   ########.fr       */
+/*   Created: 2025/03/30 16:22:04 by schiper           #+#    #+#             */
+/*   Updated: 2025/03/30 16:22:59 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#if !defined(ARGS_VALIDATOR_H)
-# define ARGS_VALIDATOR_H
-# include "libft.h"
-# include "my_bool.h"
+#include "philosophers.h"
 
-char	**split_args_by(char *argv, char *splitter);
-t_bool	check_limit_arg(char *argv, void *limit);
-
-#endif // ARGS_VALIDATOR_H)
+int	execute(void)
+{
+}

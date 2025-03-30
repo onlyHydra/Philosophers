@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 15:16:14 by schiper           #+#    #+#             */
-/*   Updated: 2025/03/30 15:28:19 by schiper          ###   ########.fr       */
+/*   Updated: 2025/03/30 16:54:53 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,9 @@
 
 # define MAX_THREADS 61736
 
+typedef struct s_params
+{
+	int
+}	t_params;
 
 #endif // PHILOSOPHERS_H
