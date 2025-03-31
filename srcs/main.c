@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 14:40:03 by schiper           #+#    #+#             */
-/*   Updated: 2025/03/30 15:14:12 by schiper          ###   ########.fr       */
+/*   Updated: 2025/03/31 14:15:53 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,5 +15,5 @@
 int	main(int argc, char **argv)
 {
 	check_args(argc, argv);
-	return (0);
+	return (execute(init_data(argc, argv)));
 }
