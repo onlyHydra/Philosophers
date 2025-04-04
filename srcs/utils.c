@@ -6,18 +6,22 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 18:08:08 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/03 18:37:20 by schiper          ###   ########.fr       */
+/*   Updated: 2025/04/04 16:34:10 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-long	ft_atoi(const char *nptr)
-
+void	think(t_philo *philo)
 {
-	int		i;
-	long	number;
-	int		sign;
+	print_action(philo, " is thinking");
+}
+
+long long	ft_atoi(const char *nptr)
+{
+	int			i;
+	long long	number;
+	int			sign;
 
 	i = 0;
 	number = 0;

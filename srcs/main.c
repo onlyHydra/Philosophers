@@ -6,31 +6,23 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 14:40:03 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/03 18:41:09 by schiper          ###   ########.fr       */
+/*   Updated: 2025/04/04 16:43:48 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "args_validator.h"
 #include "philosophers.h"
 
-int	execute(void)
+static t_bool	g_dead = my_false;
+
+t_bool	get_dead(void)
 {
-	pthread_mutex_lock(dead_flag);
-	if (dead_flag == 0)
-		pick_fork();
-	pthread_mutex_unlock(dead_flag);
-	pthread_mutex_lock(dead_flag);
-	if (dead_flag == 0)
-		eat_meals();
-	pthread_mutex_unlock(dead_flag);
-	pthread_mutex_lock(dead_flag);
-	if (dead_flag == 0)
-		tp_sleep();
-	pthread_mutex_unlock(dead_flag);
-	pthread_mutex_lock(dead_flag);
-	if (dead_flag == 0)
-		wake();
-	pthread_mutex_unlock(dead_flag);
+	return (g_dead);
+}
+
+void	set_dead(t_bool my_bool)
+{
+	g_dead = my_bool;
 }
 
 int	main(int argc, char **argv)

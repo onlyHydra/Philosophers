@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 15:16:14 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/03 18:07:20 by schiper          ###   ########.fr       */
+/*   Updated: 2025/04/04 16:45:55 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,7 @@ typedef pthread_mutex_t	t_mutex;
 
 typedef enum e_states
 {
-	EATING,
-	THINKING,
-	SLEEPING,
+	ALIVE,
 	DEAD,
 }						t_states;
 
@@ -63,8 +61,9 @@ typedef struct s_philo
 	t_locks				locks;
 	int					nb_of_meals;
 	pthread_t			thread_id;
-	int					count;
-
+	int					forks;
+	int					must_eat;
+	t_states			state;
 }						t_philo;
 
 typedef struct s_data
@@ -76,4 +75,9 @@ typedef struct s_data
 
 }						t_data;
 
+long					ft_atoi(const char *nptr);
+void					check_death(t_philo *philo);
+t_bool					check_done_eating(t_philo *philos, int philo_count);
+void					eat(t_philo *philo);
+void					pick_up_forks(t_philo *philo);
 #endif // PHILOSOPHERS_H
