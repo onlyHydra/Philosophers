@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 18:08:08 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/04 16:34:10 by schiper          ###   ########.fr       */
+/*   Updated: 2025/04/09 15:04:35 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,11 +17,23 @@ void	think(t_philo *philo)
 	print_action(philo, " is thinking");
 }
 
-long long	ft_atoi(const char *nptr)
+int	ft_strlen(char *str)
 {
-	int			i;
-	long long	number;
-	int			sign;
+	int	index;
+
+	index = 0;
+	if (str == NULL)
+		return (0);
+	while (str[index++])
+		;
+	return (index);
+}
+
+int	ft_atoi(const char *nptr)
+{
+	int	i;
+	int	number;
+	int	sign;
 
 	i = 0;
 	number = 0;

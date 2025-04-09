@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 17:03:54 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/04 16:44:03 by schiper          ###   ########.fr       */
+/*   Updated: 2025/04/09 15:16:45 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,12 @@ t_bool	done_eating(t_philo *philos, int philo_count)
 void	*start_simulation(void *ptr)
 {
 	t_philo	*philo;
-	t_philo	*philos;
+	t_data	*engine;
 	int		philo_count;
 
 	philo = (t_philo *)ptr;
-	philos = philo->engine->philos;
-	philo_count = philo->engine->count;
+	engine = philo->engine;
+	philo_count = engine->count;
 	if (philo->id % 2 == 0)
 		ft_usleep(1);
 	pthread_mutex_lock(philo->locks.meal_lock);
@@ -46,17 +46,18 @@ void	*start_simulation(void *ptr)
 	philo->time_track.last_meal = get_current_time();
 	pthread_mutex_unlock(philo->locks.meal_lock);
 	while (!get_dead())
-		philo_routine(philo, philos, philo_count);
+		philo_routine(philo, engine->philos, philo_count);
 	return (NULL);
 }
 
-void	launcher(t_engine *engine, int count)
+void	launcher(t_data *engine, int count)
 {
 	int	i;
 
 	i = -1;
 	while (++i < count)
 	{
+		engine->philos[i].engine = engine;
 		if (pthread_create(&engine->philos[i].thread_id, NULL, start_simulation,
 				&engine->philos[i]) != 0)
 			destroy_all(engine, "[Thread Creation ERROR]\n", count, 1);
