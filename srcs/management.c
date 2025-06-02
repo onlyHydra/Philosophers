@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:48:19 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/09 15:13:48 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/02 18:54:46 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,6 @@ void	destroy_all(t_data *engine, char *str, int count, int signal)
 	pthread_mutex_destroy(&engine->write_lock);
 	pthread_mutex_destroy(&engine->food_lock);
 	error_message(str, signal);
-	free(engine->forks);
-	free(engine->philos);
-	free(engine);
 }
 
 void	print_action(t_philo *philo, char *action)
@@ -36,14 +33,14 @@ void	print_action(t_philo *philo, char *action)
 	size_t	time;
 
 	pthread_mutex_lock(philo->locks.write_lock);
-	time = get_current_time() - philo->time_track.born_time;
+	time = get_current_time() - philo->born_time;
 	printf(GREEN "[%ld]" RESET " %d%s\n", time, philo->id, action);
 	pthread_mutex_unlock(philo->locks.write_lock);
 }
 
 size_t	get_current_time(void)
 {
-	t_timeval	time;
+	struct timeval	time;
 
 	if (gettimeofday(&time, NULL) == -1)
 		error_message("[get time of day ERROR]\n", 1);

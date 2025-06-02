@@ -6,26 +6,13 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 14:40:03 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/09 15:11:01 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/02 18:53:37 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "args_validator.h"
 #include "philosophers.h"
 
-static t_bool	g_dead = my_false;
-
-t_bool	get_dead(void)
-{
-	return (g_dead);
-}
-
-void	set_dead(t_bool my_bool)
-{
-	g_dead = my_bool;
-}
-
-static int	check_args(int argc, char **argv)
+int	validate(int argc, char **argv)
 {
 	int	i;
 
@@ -45,7 +32,7 @@ static int	check_args(int argc, char **argv)
 		}
 		i++;
 	}
-	if (ft_atoi(argv[0]) < 1 || ft_atoi(argv[0]) > MAX_THREADS)
+	if (ft_atoi(argv[1]) < 1 || ft_atoi(argv[1]) > MAX_THREADS)
 	{
 		write(1, "Incorect philo", ft_strlen("Incorect philo"));
 		return (1);
@@ -55,13 +42,15 @@ static int	check_args(int argc, char **argv)
 
 int	main(int argc, char **argv)
 {
-	t_philo			threads[MAX_THREADS];
-	pthread_mutex_t	dead_mutex;
-	static int		dead_flag;
+	t_philo	threads[MAX_THREADS];
+	t_mutex	forks[MAX_THREADS];
+	t_data	engine;
 
-	dead_flag = 0;
-	if (check_args(argc, argv + 1) == 1)
+	if ((validate(argc, argv)) == 1)
 		return (1);
-	launch(init_data(argc, argv + 1));
+	engine.forks = forks;
+	engine.philos = threads;
+	init_data(&engine, argv);
+	launcher(&engine, engine.count);
 	return (0);
 }

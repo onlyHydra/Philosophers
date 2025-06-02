@@ -6,41 +6,13 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 15:09:10 by schiper           #+#    #+#             */
-/*   Updated: 2025/04/09 15:16:36 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/02 18:45:25 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-t_data	*allocate_data_memory(int count)
-{
-	t_data	*data;
-
-	data = (t_data *)malloc(sizeof(t_data));
-	if (!data)
-	{
-		write(1, "Memory allocation error for data\n", 32);
-		return (NULL);
-	}
-	data->philos = (t_philo *)malloc(sizeof(t_philo) * count);
-	if (!data->philos)
-	{
-		write(1, "Memory allocation error for philosophers\n", 41);
-		free(data);
-		return (NULL);
-	}
-	data->forks = (t_mutex *)malloc(sizeof(t_mutex) * count);
-	if (!data->forks)
-	{
-		write(1, "Memory allocation error for forks\n", 35);
-		free(data->philos);
-		free(data);
-		return (NULL);
-	}
-	return (data);
-}
-
-int	initialize_mutexes(t_data *data, int count)
+t_bool	initialize_mutexes(t_data *data, int count)
 {
 	int	i;
 
@@ -50,66 +22,76 @@ int	initialize_mutexes(t_data *data, int count)
 		if (pthread_mutex_init(&data->forks[i], NULL) != 0)
 		{
 			write(1, "Mutex initialization error for forks\n", 38);
-			return (0);
+			return (my_false);
 		}
 		i++;
 	}
 	if (pthread_mutex_init(&data->food_lock, NULL) != 0)
-	{
-		write(1, "Mutex initialization error for food lock\n", 41);
-		return (0);
-	}
+		return (my_false);
 	if (pthread_mutex_init(&data->write_lock, NULL) != 0)
-	{
-		write(1, "Mutex initialization error for write lock\n", 43);
-		return (0);
-	}
-	return (1);
+		return (my_false);
+	if (pthread_mutex_init(&data->dead_lock, NULL) != 0)
+		return (my_false);
+	return (my_true);
 }
 
-int	initialize_philosophers(t_data *data, int count, char **argv)
+static void	ft_data_init(t_philo *philo, char **argv)
+{
+	philo->nb_of_philos = ft_atol(argv[1]);
+	philo->die = ft_atol(argv[2]);
+	philo->eat = ft_atol(argv[3]);
+	philo->sleep = ft_atol(argv[4]);
+	if (argv[5] != NULL)
+		philo->must_eat = ft_atol(argv[5]);
+	else
+		philo->must_eat = -1;
+}
+
+static t_bool	initialize_philosophers(t_data *data, int count, char **argv)
 {
 	int	i;
 
-	i = 0;
-	while (i < count)
+	i = -1;
+	while (++i < count)
 	{
-		data->philos[i].id = i;
+		data->philos[i].id = i + 1;
 		data->philos[i].nb_of_meals = 0;
+		data->philos[i].eatting = my_false;
 		data->philos[i].must_eat = ft_atoi(argv[1]);
-		data->philos[i].state = ALIVE;
-		data->philos[i].forks = 0;
-		data->philos[i].engine = data;
-		if (pthread_mutex_init(&data->philos[i].locks.meal_lock, NULL) != 0)
-		{
-			write(1, "Mutex initialization error for meal lock\n", 41);
-			return (0);
-		}
-		i++;
+		data->philos[i].born_time = get_current_time();
+		data->philos[i].last_meal = get_current_time();
+		data->philos[i].stop = &data->done;
+		data->philos[i].locks.left_fork = &data->forks[i];
+		data->philos[i].locks.write_lock = &data->write_lock;
+		data->philos[i].locks.dead = &data->dead_lock;
+		data->philos[i].locks.meal_lock = &data->food_lock;
+		data->philos[i].die = my_false;
+		if (i == 0)
+			data->philos[i].locks.right_fork = &data->forks[data->count - 1];
+		else
+			data->philos[i].locks.right_fork = &data->forks[i - 1];
+		ft_data_init(&data->philos[i], argv);
 	}
-	return (1);
+	return (my_true);
 }
 
-t_data	*init_data(int argc, char **argv)
+void	init_data(t_data *data, char **argv)
 {
-	t_data	*data;
-	int		philo_count;
+	int	philo_count;
 
-	philo_count = ft_atoi(argv[0]);
-	data = allocate_data_memory(philo_count);
+	philo_count = ft_atoi(argv[1]);
 	if (!data)
-		return (NULL);
+		return ;
 	if (!initialize_mutexes(data, philo_count))
 	{
 		destroy_all(data, "Mutex initialization failed.\n", philo_count, 1);
-		return (NULL);
+		return ;
 	}
 	if (!initialize_philosophers(data, philo_count, argv))
 	{
 		destroy_all(data, "Philosopher initialization failed.\n", philo_count,
 			1);
-		return (NULL);
+		return ;
 	}
 	data->count = philo_count;
-	return (data);
 }
