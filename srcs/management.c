@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:48:19 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:54:46 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:39:31 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,17 +25,28 @@ void	destroy_all(t_data *engine, char *str, int count, int signal)
 		pthread_mutex_destroy(&engine->forks[count]);
 	pthread_mutex_destroy(&engine->write_lock);
 	pthread_mutex_destroy(&engine->food_lock);
+	pthread_mutex_destroy(&engine->dead_lock);
+	free(engine->forks);
+	engine->forks = NULL;
+	free(engine->philos);
+	engine->philos = NULL;
+	free(engine);
 	error_message(str, signal);
 }
 
-void	print_action(t_philo *philo, char *action)
+void	print_action(t_philo *philo, char *action, char *color)
 {
 	size_t	time;
 
-	pthread_mutex_lock(philo->locks.write_lock);
+	pthread_mutex_lock(philo->write_lock);
 	time = get_current_time() - philo->born_time;
-	printf(GREEN "[%ld]" RESET " %d%s\n", time, philo->id, action);
-	pthread_mutex_unlock(philo->locks.write_lock);
+	printf("%s"
+			"[%ld]" RESET " %d  %s\n",
+			color,
+			time,
+			philo->id,
+			action);
+	pthread_mutex_unlock(philo->write_lock);
 }
 
 size_t	get_current_time(void)

@@ -6,11 +6,35 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 14:40:03 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:53:37 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:45:27 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+void	free_all(t_data *engine)
+{
+	int	count;
+
+	count = engine->count;
+	while (--count >= 0)
+		pthread_mutex_destroy(&engine->forks[count]);
+	pthread_mutex_destroy(&engine->write_lock);
+	pthread_mutex_destroy(&engine->food_lock);
+	pthread_mutex_destroy(&engine->dead_lock);
+	free(engine->forks);
+	engine->forks = NULL;
+	free(engine->philos);
+	engine->philos = NULL;
+	free(engine);
+}
+
+void	debug_print(t_philo *philo, char *message)
+{
+	pthread_mutex_lock(philo->write_lock);
+	printf("%s %d StopFlage:%d \n", message, philo->id, *philo->stop);
+	pthread_mutex_unlock(philo->write_lock);
+}
 
 int	validate(int argc, char **argv)
 {
@@ -42,15 +66,24 @@ int	validate(int argc, char **argv)
 
 int	main(int argc, char **argv)
 {
-	t_philo	threads[MAX_THREADS];
-	t_mutex	forks[MAX_THREADS];
-	t_data	engine;
+	t_philo	*threads;
+	t_mutex	*forks;
+	t_data	*engine;
 
 	if ((validate(argc, argv)) == 1)
 		return (1);
-	engine.forks = forks;
-	engine.philos = threads;
-	init_data(&engine, argv);
-	launcher(&engine, engine.count);
+	threads = malloc(sizeof(t_philo) * MAX_THREADS);
+	forks = malloc(sizeof(t_mutex) * MAX_THREADS);
+	engine = malloc(sizeof(t_data));
+	engine->forks = forks;
+	engine->philos = threads;
+	if (init_data(engine, argv) == my_true)
+		launcher(engine, engine->count);
+	else
+	{
+		free(engine->forks);
+		free(engine->philos);
+		free(engine);
+	}
 	return (0);
 }

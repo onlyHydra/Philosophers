@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/03 18:08:08 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:54:33 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:09:05 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,10 @@ int	ft_atoi(const char *nptr)
 
 t_bool	stop_check_loop(t_philo *philo)
 {
-	pthread_mutex_lock(philo->locks.dead);
+	pthread_mutex_lock(philo->dead);
 	if (*philo->stop == my_true)
-		return (pthread_mutex_unlock(philo->locks.dead), my_true);
-	pthread_mutex_unlock(philo->locks.dead);
+		return (pthread_mutex_unlock(philo->dead), my_true);
+	pthread_mutex_unlock(philo->dead);
 	return (my_false);
 }
 

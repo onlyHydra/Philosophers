@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 15:16:14 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:15:26 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 14:09:18 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,22 +38,12 @@ typedef struct s_params
 
 }						t_params;
 
-typedef struct s_locks
-{
-	t_mutex				*left_fork;
-	t_mutex				*right_fork;
-	t_mutex				*write_lock;
-	t_mutex				*meal_lock;
-	t_mutex				*dead;
-}						t_locks;
-
 typedef struct s_philo
 {
 	pthread_t			thread;
 	int					id;
 	int					nb_of_meals;
 	int					nb_of_philos;
-	t_locks				locks;
 	int					must_eat;
 	t_bool				*stop;
 	t_bool				eatting;
@@ -62,6 +52,11 @@ typedef struct s_philo
 	size_t				sleep;
 	size_t				last_meal;
 	size_t				born_time;
+	t_mutex				*left_fork;
+	t_mutex				*right_fork;
+	t_mutex				*write_lock;
+	t_mutex				*meal_lock;
+	t_mutex				*dead;
 }						t_philo;
 
 typedef struct s_data
@@ -84,13 +79,17 @@ void					error_message(char *text, int signal);
 void					destroy_all(t_data *engine, char *str, int count,
 							int signal);
 void					*observer(void *arg);
-void					print_action(t_philo *philo, char *action);
+void					print_action(t_philo *philo, char *action, char *color);
 size_t					get_current_time(void);
 void					ft_usleep(size_t mls);
 void					launcher(t_data *engine, int count);
 t_bool					stop_check_loop(t_philo *philo);
-void					init_data(t_data *engine, char **argv);
+t_bool					init_data(t_data *engine, char **argv);
 int						ft_strlen(char *str);
 size_t					get_time_ms(void);
 long					ft_atol(char *s);
+t_bool					attempt_fork(t_philo *philo);
+void					debug_print(t_philo *philo, char *message);
+void					free_all(t_data *engine);
+
 #endif // PHILOSOPHERS_H

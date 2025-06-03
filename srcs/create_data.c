@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 15:09:10 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:45:25 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:39:12 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ t_bool	initialize_mutexes(t_data *data, int count)
 		}
 		i++;
 	}
-	if (pthread_mutex_init(&data->food_lock, NULL) != 0)
+	if (pthread_mutex_init(&(data->food_lock), NULL) != 0)
 		return (my_false);
-	if (pthread_mutex_init(&data->write_lock, NULL) != 0)
+	if (pthread_mutex_init(&(data->write_lock), NULL) != 0)
 		return (my_false);
-	if (pthread_mutex_init(&data->dead_lock, NULL) != 0)
+	if (pthread_mutex_init(&(data->dead_lock), NULL) != 0)
 		return (my_false);
 	return (my_true);
 }
@@ -61,37 +61,34 @@ static t_bool	initialize_philosophers(t_data *data, int count, char **argv)
 		data->philos[i].born_time = get_current_time();
 		data->philos[i].last_meal = get_current_time();
 		data->philos[i].stop = &data->done;
-		data->philos[i].locks.left_fork = &data->forks[i];
-		data->philos[i].locks.write_lock = &data->write_lock;
-		data->philos[i].locks.dead = &data->dead_lock;
-		data->philos[i].locks.meal_lock = &data->food_lock;
+		data->philos[i].left_fork = &(data->forks[i]);
+		data->philos[i].write_lock = &(data->write_lock);
+		data->philos[i].dead = &(data->dead_lock);
+		data->philos[i].meal_lock = &(data->food_lock);
 		data->philos[i].die = my_false;
-		if (i == 0)
-			data->philos[i].locks.right_fork = &data->forks[data->count - 1];
-		else
-			data->philos[i].locks.right_fork = &data->forks[i - 1];
+		data->philos[i].right_fork = &(data->forks[(i + 1) % count]);
 		ft_data_init(&data->philos[i], argv);
 	}
 	return (my_true);
 }
 
-void	init_data(t_data *data, char **argv)
+t_bool	init_data(t_data *data, char **argv)
 {
 	int	philo_count;
 
 	philo_count = ft_atoi(argv[1]);
-	if (!data)
-		return ;
+	data->done = my_false;
 	if (!initialize_mutexes(data, philo_count))
 	{
 		destroy_all(data, "Mutex initialization failed.\n", philo_count, 1);
-		return ;
+		return (my_false);
 	}
 	if (!initialize_philosophers(data, philo_count, argv))
 	{
 		destroy_all(data, "Philosopher initialization failed.\n", philo_count,
 			1);
-		return ;
+		return (my_false);
 	}
 	data->count = philo_count;
+	return (my_true);
 }

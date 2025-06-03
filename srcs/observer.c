@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 12:12:33 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 17:44:28 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 13:59:10 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,10 @@
 
 static t_bool	philo_dead(t_philo *philo, size_t time_to_die)
 {
-	pthread_mutex_lock(philo->locks.meal_lock);
-	if (get_time_ms() - philo->last_meal >= time_to_die
-		&& !philo->eatting)
-		return (pthread_mutex_unlock(philo->locks.meal_lock), my_true);
-	pthread_mutex_unlock(philo->locks.meal_lock);
+	pthread_mutex_lock(philo->meal_lock);
+	if (get_time_ms() - philo->last_meal >= time_to_die && !philo->eatting)
+		return (pthread_mutex_unlock(philo->meal_lock), my_true);
+	pthread_mutex_unlock(philo->meal_lock);
 	return (my_false);
 }
 
@@ -31,10 +30,10 @@ static t_bool	is_dead(t_philo *philos)
 	{
 		if (philo_dead(&philos[i], philos[i].die))
 		{
-			print_action(&philos[i], "died");
-			pthread_mutex_lock(philos[0].locks.dead);
+			print_action(&philos[i], "died", RED);
+			pthread_mutex_lock(philos[0].dead);
 			*philos->stop = my_true;
-			pthread_mutex_unlock(philos[0].locks.dead);
+			pthread_mutex_unlock(philos[0].dead);
 			return (my_true);
 		}
 		i++;
@@ -53,17 +52,17 @@ static t_bool	is_enough_meals(t_philo *philos)
 		return (my_false);
 	while (i < philos[0].nb_of_philos)
 	{
-		pthread_mutex_lock(philos[i].locks.meal_lock);
+		pthread_mutex_lock(philos[i].meal_lock);
 		if (philos[i].nb_of_meals >= philos[i].must_eat)
 			all++;
-		pthread_mutex_unlock(philos[i].locks.meal_lock);
+		pthread_mutex_unlock(philos[i].meal_lock);
 		i++;
 	}
 	if (all == philos[0].nb_of_philos)
 	{
-		pthread_mutex_lock(philos[0].locks.dead);
+		pthread_mutex_lock(philos[0].dead);
 		*philos->stop = my_true;
-		pthread_mutex_unlock(philos[0].locks.dead);
+		pthread_mutex_unlock(philos[0].dead);
 		return (my_true);
 	}
 	return (my_false);
@@ -78,6 +77,7 @@ void	*observer(void *arg)
 	{
 		if (is_dead(philos) || is_enough_meals(philos))
 			break ;
+        ft_usleep(10);
 	}
 	return (arg);
 }

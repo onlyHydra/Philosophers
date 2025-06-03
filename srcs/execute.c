@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 17:03:54 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/02 18:38:10 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/03 14:09:06 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,33 +24,35 @@ size_t	get_time_ms(void)
 
 static void	think(t_philo *philo)
 {
-	print_action(philo, " is thinking");
+	pthread_mutex_lock(philo->dead);
+	if (*philo->stop == my_false)
+		print_action(philo, " is thinking", GREEN);
+	pthread_mutex_unlock(philo->dead);
 }
 
 static void	dinning(t_philo *philo)
 {
-	pthread_mutex_lock(philo->locks.right_fork);
-	print_action(philo, "picked right fork");
-	if (philo->nb_of_philos == 1)
-	{
-		ft_usleep(philo->die);
-		pthread_mutex_unlock(philo->locks.right_fork);
+	if (attempt_fork(philo) == my_false)
 		return ;
-	}
-	pthread_mutex_lock(philo->locks.left_fork);
-	print_action(philo, "picked left fork");
+	pthread_mutex_lock(philo->meal_lock);
+	print_action(philo, "is eatting", GREEN);
 	philo->eatting = my_true;
-	print_action(philo, "is eatting");
-	pthread_mutex_lock(philo->locks.meal_lock);
 	philo->last_meal = get_current_time();
 	philo->nb_of_meals++;
-	pthread_mutex_unlock(philo->locks.meal_lock);
 	ft_usleep(philo->eat);
+	pthread_mutex_unlock(philo->left_fork);
+	pthread_mutex_unlock(philo->right_fork);
 	philo->eatting = my_false;
-	pthread_mutex_unlock(philo->locks.left_fork);
-	pthread_mutex_unlock(philo->locks.right_fork);
-	print_action(philo, "is sleeping");
-	ft_usleep(philo->sleep);
+	pthread_mutex_unlock(philo->meal_lock);
+	pthread_mutex_lock(philo->dead);
+	if (*philo->stop == my_false)
+	{
+		print_action(philo, "is sleeping", GREEN);
+		pthread_mutex_unlock(philo->dead);
+		ft_usleep(philo->sleep);
+	}
+	else
+		pthread_mutex_unlock(philo->dead);
 }
 
 void	*start_simulation(void *arg)
@@ -62,8 +64,14 @@ void	*start_simulation(void *arg)
 		ft_usleep(1);
 	while (!stop_check_loop(philo))
 	{
-		dinning(philo);
-		think(philo);
+		if (!stop_check_loop(philo) && philo->nb_of_meals != philo->must_eat)
+			dinning(philo);
+		else
+			break ;
+		if (!stop_check_loop(philo) && philo->nb_of_meals != philo->must_eat)
+			think(philo);
+		else
+			break ;
 	}
 	return (arg);
 }
@@ -73,14 +81,14 @@ void	launcher(t_data *engine, int count)
 	int	i;
 
 	i = -1;
-	if (pthread_create(&engine->monitor, NULL, observer, engine->philos) != 0)
-		destroy_all(engine, "[Observer Creation ERROR]\n", count, 1);
 	while (++i < count)
 	{
 		if (pthread_create(&engine->philos[i].thread, NULL, start_simulation,
 				&engine->philos[i]) != 0)
 			destroy_all(engine, "[Thread Creation ERROR]\n", count, 1);
 	}
+	if (pthread_create(&engine->monitor, NULL, observer, engine->philos) != 0)
+		destroy_all(engine, "[Observer Creation ERROR]\n", count, 1);
 	if (pthread_join(engine->monitor, NULL) != 0)
 		destroy_all(engine, "[Thread Join ERROR]\n", count, 1);
 	i = -1;
@@ -89,4 +97,5 @@ void	launcher(t_data *engine, int count)
 		if (pthread_join(engine->philos[i].thread, NULL) != 0)
 			destroy_all(engine, "[Thread Join ERROR]\n", count, 1);
 	}
+	free_all(engine);
 }
