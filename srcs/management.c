@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/09 14:48:19 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/03 13:39:31 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/05 18:41:08 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,12 +40,10 @@ void	print_action(t_philo *philo, char *action, char *color)
 
 	pthread_mutex_lock(philo->write_lock);
 	time = get_current_time() - philo->born_time;
-	printf("%s"
-			"[%ld]" RESET " %d  %s\n",
-			color,
-			time,
-			philo->id,
-			action);
+	printf("%s", color);
+	printf("[%ld]", time);
+	printf(RESET);
+	printf(" %d  %s\n", philo->id, action);
 	pthread_mutex_unlock(philo->write_lock);
 }
 

@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 17:03:54 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/03 14:09:06 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/05 18:35:59 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,29 +30,33 @@ static void	think(t_philo *philo)
 	pthread_mutex_unlock(philo->dead);
 }
 
-static void	dinning(t_philo *philo)
+static int	dinning(t_philo *philo)
 {
-	if (attempt_fork(philo) == my_false)
-		return ;
+	if (stop_check_loop(philo))
+		return (1);
+	if (!attempt_fork(philo))
+		return (1);
 	pthread_mutex_lock(philo->meal_lock);
-	print_action(philo, "is eatting", GREEN);
-	philo->eatting = my_true;
-	philo->last_meal = get_current_time();
-	philo->nb_of_meals++;
+	if (stop_check_loop(philo))
+	{
+		pthread_mutex_unlock(philo->meal_lock);
+		release_forks(philo);
+		return (1);
+	}
+	attempt_eat(philo);
+	pthread_mutex_unlock(philo->meal_lock);
+	if (stop_check_loop(philo))
+		return (release_forks(philo), 1);
+	release_forks(philo);
 	ft_usleep(philo->eat);
-	pthread_mutex_unlock(philo->left_fork);
-	pthread_mutex_unlock(philo->right_fork);
+	pthread_mutex_lock(philo->meal_lock);
 	philo->eatting = my_false;
 	pthread_mutex_unlock(philo->meal_lock);
-	pthread_mutex_lock(philo->dead);
-	if (*philo->stop == my_false)
-	{
-		print_action(philo, "is sleeping", GREEN);
-		pthread_mutex_unlock(philo->dead);
-		ft_usleep(philo->sleep);
-	}
-	else
-		pthread_mutex_unlock(philo->dead);
+	if (stop_check_loop(philo))
+		return (1);
+	print_action(philo, "is sleeping", GREEN);
+	ft_usleep(philo->sleep);
+	return (0);
 }
 
 void	*start_simulation(void *arg)

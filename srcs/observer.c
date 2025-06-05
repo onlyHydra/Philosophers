@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/02 12:12:33 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/03 13:59:10 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/05 18:37:56 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ void	*observer(void *arg)
 	{
 		if (is_dead(philos) || is_enough_meals(philos))
 			break ;
-        ft_usleep(10);
+		ft_usleep(10);
 	}
 	return (arg);
 }

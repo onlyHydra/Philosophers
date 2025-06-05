@@ -6,7 +6,7 @@
 /*   By: schiper <schiper@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/30 15:16:14 by schiper           #+#    #+#             */
-/*   Updated: 2025/06/03 14:09:18 by schiper          ###   ########.fr       */
+/*   Updated: 2025/06/05 18:32:00 by schiper          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,8 @@ int						ft_strlen(char *str);
 size_t					get_time_ms(void);
 long					ft_atol(char *s);
 t_bool					attempt_fork(t_philo *philo);
+void					release_forks(t_philo *philo);
 void					debug_print(t_philo *philo, char *message);
 void					free_all(t_data *engine);
-
+void					attempt_eat(t_philo *philo);
 #endif // PHILOSOPHERS_H
